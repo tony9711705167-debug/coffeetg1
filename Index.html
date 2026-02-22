@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>COFFEE TG - POS ELITE</title>
+
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="COFFEE TG">
+    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/924/924514.png">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/924/924514.png">
+
+    <style>
+        :root { --cafe: #6f4e37; --crema: #f4f1ea; --verde: #25d366; --azul: #3498db; --rojo: #e74c3c; --negro: #2c3e50; --dorado: #b8860b; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: var(--crema); padding: 15px; max-width: 500px; margin: auto; color: var(--negro); }
+        .card { background: white; padding: 15px; border-radius: 12px; margin-bottom: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border: 1px solid #ddd; }
+        h1 { color: var(--cafe); text-align: center; margin: 0; }
+        .slogan { text-align: center; font-size: 0.85em; color: var(--cafe); margin-top: 2px; font-style: italic; font-weight: bold; }
+        .promo-banner { background: var(--dorado); color: white; text-align: center; padding: 8px; border-radius: 8px; font-weight: bold; margin-bottom: 15px; animation: flash 1.5s infinite; }
+        @keyframes flash { 0% {opacity: 1;} 50% {opacity: 0.6;} 100% {opacity: 1;} }
+        
+        input, select { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; box-sizing: border-box; }
+        .item { display: flex; align-items: center; padding: 12px 0; border-bottom: 1px solid #eee; justify-content: space-between; }
+        .info h3 { margin: 0; font-size: 1.1em; }
+        .info p { margin: 2px 0; color: var(--cafe); font-weight: bold; }
+        
+        button { border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        .btn-add { background: var(--cafe); color: white; padding: 10px 20px; font-size: 1.1em; }
+        .btn-wa { background: var(--verde); color: white; width: 100%; padding: 18px; font-size: 1.2em; margin-top: 10px; }
+        .btn-clear { background: #bbb; color: white; padding: 5px 10px; font-size: 0.8em; margin-bottom: 5px; float: right; }
+        
+        /* ADMIN */
+        .contenedor-scroll { overflow-x: auto; width: 100%; margin-top: 10px; }
+        .tabla-reporte { width: 100%; border-collapse: collapse; background: white; min-width: 600px; font-size: 0.8em; }
+        .tabla-reporte th, .tabla-reporte td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        .progress-container { background: #eee; border-radius: 10px; height: 8px; width: 80px; display: inline-block; }
+        .progress-bar { background: var(--verde); height: 100%; border-radius: 10px; }
+        .corte-caja { background: var(--negro); color: white; padding: 10px; border-radius: 8px; margin-bottom: 10px; text-align: center; }
+    </style>
+</head>
+<body onload="bienvenida()">
+
+    <div id="custom-alert" style="display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(2px);">
+        <div style="background: white; margin: 40% auto; padding: 25px; border-radius: 20px; width: 85%; max-width: 380px; text-align: center; border: 3px solid var(--cafe);">
+            <span style="font-size: 3em;" id="alert-icon">☕</span>
+            <p id="alert-msg" style="font-size: 1.1em; line-height: 1.4;"></p>
+            <button style="background: var(--cafe); color: white; padding: 12px 25px; margin-top: 20px; width: 100%; border-radius: 10px;" onclick="cerrarAviso()">ENTENDIDO</button>
+        </div>
+    </div>
+
+    <div class="promo-banner">🔥 ¡PROMO: 10 compras = 1 VALE GRATIS! 🔥</div>
+
+    <h1>☕ COFFEE TG</h1>
+    <div class="slogan">Calidad en cada gota</div>
+
+    <div class="card">
+        <input type="text" id="cliente" placeholder="Nombre del cliente">
+        <input type="tel" id="telefono" placeholder="WhatsApp (10 dígitos)">
+    </div>
+
+    <div class="card">
+        <div class="item">
+            <div class="info"><h3>Café Negro</h3><p>$15.00</p>
+                <select id="temp-negro" style="width:auto; font-size:12px; padding:5px;"><option value="Caliente">Caliente</option><option value="Tibio">Tibio</option></select>
+            </div>
+            <button class="btn-add" onclick="sumarProd('Café Negro', 15, 'temp-negro')">+</button>
+        </div>
+        <div class="item">
+            <div class="info"><h3>Café con Leche</h3><p>$20.00</p>
+                <select id="temp-leche" style="width:auto; font-size:12px; padding:5px;"><option value="Caliente">Caliente</option><option value="Tibio">Tibio</option></select>
+            </div>
+            <button class="btn-add" onclick="sumarProd('Café con Leche', 20, 'temp-leche')">+</button>
+        </div>
+        <div class="item">
+            <div class="info"><h3>Té McCormick</h3><p>$15.00</p>
+                <input type="text" id="t-det" placeholder="Sabor (ej. Limón)" style="width:110px; padding:5px; font-size:12px; margin-bottom: 2px;">
+                <select id="temp-te" style="width:auto; font-size:12px; padding:5px;"><option value="Caliente">Caliente</option><option value="Tibio">Tibio</option></select>
+            </div>
+            <button class="btn-add" onclick="sumarTe()">+</button>
+        </div>
+        <div class="item">
+            <div class="info"><h3>Omnilife</h3><p>$25.00</p>
+                <input type="text" id="o-det" placeholder="Producto" style="width:110px; padding:5px; font-size:12px;">
+            </div>
+            <button class="btn-add" onclick="sumarOmni()">+</button>
+        </div>
+        <div class="item">
+            <div class="info"><h3>Pan Dulce</h3><p>$10.00</p></div>
+            <button class="btn-add" onclick="sumarProd('Pan Dulce', 10, null)">+</button>
+        </div>
+    </div>
+
+    <div class="card">
+        <button class="btn-clear" onclick="vaciarCarrito()">Limpiar Carrito</button>
+        <h2>🛒 Pedido Actual</h2>
+        <div id="lista-carrito">Vacío</div>
+        <h3 style="text-align: right;">Total: $<span id="total-val">0.00</span></h3>
+        <button class="btn-wa" onclick="enviar()">Confirmar por WhatsApp 📱</button>
+    </div>
+
+    <button onclick="verAdmin()" style="background:none; color:#bbb; width:100%; border:none; font-size: 10px; margin-top:20px; cursor:pointer;">PANEL DE CONTROL</button>
+
+    <div id="panel-admin" class="card" style="display:none; border: 2px solid var(--negro);">
+        <h3>📊 Reportes y Corte de Caja</h3>
+        <div class="corte-caja">
+            <small>Ventas de Hoy:</small><br>
+            <strong style="font-size: 1.5em;">$<span id="total-hoy">0.00</span></strong>
+        </div>
+        <input type="text" id="buscador" placeholder="🔍 Buscar cliente..." onkeyup="mostrarReporte()">
+        <div class="contenedor-scroll"><div id="contenedor-tabla"></div></div>
+        <div style="margin-top:10px; display:flex; gap:5px;">
+            <button onclick="descargar()" style="background:var(--azul); color:white; flex:1; padding:10px;">Excel</button>
+            <button onclick="resetPuntos()" style="background:var(--dorado); color:white; flex:1; padding:10px;">Reset Puntos</button>
+        </div>
+        <button onclick="document.getElementById('panel-admin').style.display='none'" style="width:100%; margin-top:10px;">Cerrar Panel</button>
+    </div>
+
+    <script>
+        let carrito = {};
+
+        function mostrarAviso(m, icon = "☕") {
+            document.getElementById('alert-icon').innerText = icon;
+            document.getElementById('alert-msg').innerText = m;
+            document.getElementById('custom-alert').style.display = 'block';
+        }
+        function cerrarAviso() { document.getElementById('custom-alert').style.display = 'none'; }
+        function bienvenida() { setTimeout(() => { mostrarAviso("¡Bienvenido a COFFEE TG!"); }, 600); }
+
+        function sumarProd(nombre, precio, idTemp) {
+            let t = idTemp ? ` (${document.getElementById(idTemp).value})` : "";
+            let k = nombre + t;
+            carrito[k] = carrito[k] ? { p: precio, c: carrito[k].c + 1, base: nombre } : { p: precio, c: 1, base: nombre };
+            render();
+        }
+
+        function sumarTe() {
+            let s = document.getElementById('t-det').value.trim();
+            let temp = document.getElementById('temp-te').value;
+            if(!s) return mostrarAviso("Escribe el sabor del té.");
+            let k = `Té McCormick ${s} (${temp})`;
+            carrito[k] = carrito[k] ? { p: 15, c: carrito[k].c + 1, base: "Té" } : { p: 15, c: 1, base: "Té" };
+            document.getElementById('t-det').value = "";
+            render();
+        }
+
+        function sumarOmni() {
+            let o = document.getElementById('o-det').value.trim();
+            if(!o) return mostrarAviso("Escribe el producto Omnilife.");
+            let k = `Omnilife (${o})`;
+            carrito[k] = carrito[k] ? { p: 25, c: carrito[k].c + 1, base: "Omnilife" } : { p: 25, c: 1, base: "Omnilife" };
+            document.getElementById('o-det').value = "";
+            render();
+        }
+
+        function del(k) { if (carrito[k].c > 1) carrito[k].c--; else delete carrito[k]; render(); }
+        function vaciarCarrito() { carrito = {}; render(); }
+
+        function render() {
+            const div = document.getElementById('lista-carrito');
+            let t = 0; div.innerHTML = "";
+            Object.keys(carrito).forEach(k => {
+                let sub = carrito[k].p * carrito[k].c;
+                t += sub;
+                div.innerHTML += `<div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                    <span>${carrito[k].c}x ${k}</span>
+                    <span>$${sub.toFixed(2)} <button onclick="del('${k}')" style="background:var(--rojo); color:white; padding:2px 5px; border-radius:4px;">x</button></span>
+                </div>`;
+            });
+            document.getElementById('total-val').innerText = t.toFixed(2);
+        }
+
+        function enviar() {
+            const cli = document.getElementById('cliente').value.trim();
+            const tel = document.getElementById('telefono').value.trim();
+            const tot = parseFloat(document.getElementById('total-val').innerText);
+            if(!cli || !tel) return mostrarAviso("Nombre y Teléfono son requeridos.");
+            if(tot === 0) return mostrarAviso("Carrito vacío.");
+
+            let lealtad = JSON.parse(localStorage.getItem('tg_lealtad')) || {};
+            let ventasHoy = JSON.parse(localStorage.getItem('tg_ventas_hoy')) || { fecha: new Date().toLocaleDateString(), total: 0 };
+            
+            if(ventasHoy.fecha !== new Date().toLocaleDateString()) {
+                ventasHoy = { fecha: new Date().toLocaleDateString(), total: 0 };
+            }
+
+            if(!lealtad[tel]) lealtad[tel] = { nombre: cli, productos: {}, importeTotal: 0 };
+            
+            lealtad[tel].importeTotal += tot;
+            ventasHoy.total += tot;
+            
+            let vales = [];
+            Object.keys(carrito).forEach(k => {
+                let nb = carrito[k].base;
+                lealtad[tel].productos[nb] = (lealtad[tel].productos[nb] || 0) + carrito[k].c;
+                if(lealtad[tel].productos[nb] >= 10) {
+                    vales.push(nb); lealtad[tel].productos[nb] -= 10;
+                }
+            });
+
+            localStorage.setItem('tg_lealtad', JSON.stringify(lealtad));
+            localStorage.setItem('tg_ventas_hoy', JSON.stringify(ventasHoy));
+
+            let msj = `*COFFEE TG - PEDIDO*\n*Cliente:* ${cli}\n*Tel:* ${tel}\n------------------\n`;
+            Object.keys(carrito).forEach(k => msj += `${carrito[k].c}x ${k}\n`);
+            msj += `------------------\n*TOTAL: $${tot.toFixed(2)}*`;
+            
+            if(vales.length > 0) {
+                msj += `\n\n🎟️ *VALE GANADO:* El cliente ganó 1 vale por un *${vales.join(', ')}* GRATIS.`;
+                mostrarAviso("¡GANASTE UN VALE GRATIS!", "🎟️");
+            }
+
+            window.open(`https://wa.me/529711705167?text=${encodeURIComponent(msj)}`);
+            vaciarCarrito();
+        }
+
+        function verAdmin() { if (prompt("Clave:") === "1234") { document.getElementById('panel-admin').style.display='block'; mostrarReporte(); } }
+
+        function mostrarReporte() {
+            const lealtad = JSON.parse(localStorage.getItem('tg_lealtad')) || {};
+            const ventasHoy = JSON.parse(localStorage.getItem('tg_ventas_hoy')) || { total: 0 };
+            const tabla = document.getElementById('contenedor-tabla');
+            const busca = document.getElementById('buscador').value.toLowerCase();
+            
+            document.getElementById('total-hoy').innerText = ventasHoy.total.toFixed(2);
+            
+            let h = `<table class="tabla-reporte"><tr><th>Cliente/Tel</th><th>Gasto Histórico</th><th>Puntos</th></tr>`;
+            Object.keys(lealtad).forEach(t => {
+                if(lealtad[t].nombre.toLowerCase().includes(busca) || t.includes(busca)) {
+                    let pHtml = "";
+                    Object.keys(lealtad[t].productos).forEach(p => {
+                        let pts = lealtad[t].productos[p];
+                        pHtml += `${p}: ${pts}/10 <div class="progress-container"><div class="progress-bar" style="width:${pts*10}%"></div></div><br>`;
+                    });
+                    h += `<tr><td>${lealtad[t].nombre}<br><small>${t}</small></td><td>$${lealtad[t].importeTotal.toFixed(2)}</td><td>${pHtml || '0'}</td></tr>`;
+                }
+            });
+            tabla.innerHTML = h + `</table>`;
+        }
+
+        function resetPuntos() {
+            if(confirm("¿Poner puntos en cero? (Ventas totales NO se borran)")) {
+                let l = JSON.parse(localStorage.getItem('tg_lealtad')) || {};
+                Object.keys(l).forEach(t => l[t].productos = {});
+                localStorage.setItem('tg_lealtad', JSON.stringify(l)); mostrarReporte();
+            }
+        }
+
+        function descargar() {
+            const l = JSON.parse(localStorage.getItem('tg_lealtad')) || {};
+            let csv = "\uFEFFNombre,Telefono,Gasto_Total,Puntos\n";
+            Object.keys(l).forEach(t => csv += `"${l[t].nombre}","${t}","${l[t].importeTotal}","${JSON.stringify(l[t].productos).replace(/"/g,'')}"\n`);
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = `CoffeeTG_Reporte.csv`; link.click();
+        }
+    </script>
+</body>
+</html>
